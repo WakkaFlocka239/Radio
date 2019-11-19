@@ -66,7 +66,6 @@ public class Radio extends JavaPlugin {
 		allSongFiles = SONGS_DIR.listFiles();
 
 		// Setup Radius Radios
-		// **This is where the error starts from.**
 		setupRadiusRadios();
 
 		// Setup Server Radio
