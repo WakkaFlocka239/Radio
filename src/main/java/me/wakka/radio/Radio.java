@@ -15,8 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-//TODO Permissions
-
 public class Radio extends JavaPlugin {
 	private static Radio instance;
 
