@@ -1,0 +1,13 @@
+main: me.wakka.radio.Radio
+name: Radio
+version: 1.0.0
+author: WakkaFlocka
+description: Play songs in a radio
+depend: [NoteBlockAPI]
+api-version: 1.14
+commands:
+  radio:
+    permission: radio.user
+    description: Root command Radio
+    usage: /radio
+    permission-message: You don't have access to this command
