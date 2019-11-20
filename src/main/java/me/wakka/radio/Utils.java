@@ -25,7 +25,9 @@ class Utils {
 
 	static boolean isListening(Player player, SongPlayer radio){
 		Set<UUID> uuids = radio.getPlayerUUIDs();
-		return uuids.contains(player.getUniqueId());
+		if(!uuids.isEmpty())
+			return uuids.contains(player.getUniqueId());
+		return false;
 	}
 
 	static SongPlayer getListenedRadio(Player player){

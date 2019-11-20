@@ -40,12 +40,12 @@ public class Radio extends JavaPlugin {
 	@Override
 	public void onEnable(){
 		// NoteBlockAPI
-		boolean NoteBlockAPI = true;
-		if (!Bukkit.getPluginManager().isPluginEnabled("NoteBlockAPI")){
-			getLogger().severe("*** NoteBlockAPI is not installed or not enabled. ***");
-			NoteBlockAPI = false;
-			return;
-		}
+//		boolean NoteBlockAPI = true;
+//		if (!Bukkit.getPluginManager().isPluginEnabled("NoteBlockAPI")){
+//			getLogger().severe("*** NoteBlockAPI is not installed or not enabled. ***");
+//			NoteBlockAPI = false;
+//			return;
+//		}
 
 		// Create Files
 		try{
