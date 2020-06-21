@@ -29,6 +29,8 @@ public class Radio extends JavaPlugin {
 	private static FileConfiguration serverRadioFC;
 	private static FileConfiguration radiusRadioFC;
 
+	// TODO: If you're listening to a radius radio, and you do /radio toggle, it turns on the server radio,
+	//		--> needs to check if you're listening to a radius radio "you are too close to another radio"
 	public Radio(){
 		if (instance == null){
 			instance = this;
@@ -74,10 +76,20 @@ public class Radio extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		super.onDisable();
-		Set<UUID> uuids = serverRadio.getPlayerUUIDs();
-		for (UUID uuid: uuids) {
-			serverRadio.removePlayer(uuid);
+		if(serverRadio.getPlayerUUIDs() != null && serverRadio.getPlayerUUIDs().size() != 0) {
+			Set<UUID> uuids = serverRadio.getPlayerUUIDs();
+			for (UUID uuid : uuids) {
+				serverRadio.removePlayer(uuid);
+			}
 		}
+
+		for (PositionSongPlayer tempRadio : radiusRadios) {
+			tempRadio.setAutoDestroy(true);
+			tempRadio.setPlaying(false);
+			tempRadio.destroy();
+		}
+
+		radiusRadios.clear();
 	}
 
 	private static File[] getAllSongFiles(){
@@ -238,13 +250,18 @@ public class Radio extends JavaPlugin {
 	static void addPlayer(Player player, SongPlayer radio){
 		if(!Utils.isListening(player, radio)){
 			radio.addPlayer(player);
-			Utils.actionBarMessage(player, radio.getSong().getTitle(), false);
+			if(radio instanceof  PositionSongPlayer) {
+				PositionSongPlayer songPlayer = (PositionSongPlayer) radio;
+				if(Utils.isInRangeOfRadiusRadio(player, songPlayer))
+					Utils.actionBarMessage(player, radio.getSong().getTitle(), false);
+			}
 		}
 	}
 
 	static void removePlayer(Player player, SongPlayer radio){
 		if(Utils.isListening(player, radio)) {
 			radio.removePlayer(player);
+			Utils.actionBarMessage(player, "§c§lYou have left the server radio");
 		}else{
 			player.sendMessage(Command.PREFIX + " §cYou are not listening to a radio!");
 		}

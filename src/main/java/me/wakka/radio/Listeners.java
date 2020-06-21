@@ -16,23 +16,24 @@ import java.util.UUID;
 public class Listeners implements Listener {
 
 	@EventHandler
-	public void onSongNext(SongNextEvent e){
+	public void onSongNext(SongNextEvent e) {
 		SongPlayer sp = e.getSongPlayer();
 		PositionSongPlayer radiusRadio = null;
 		boolean isInRange = true;
-		if(sp instanceof PositionSongPlayer){
-			radiusRadio = (PositionSongPlayer) sp;
-		}
+		boolean inSameWorld = true;
 		String song = sp.getSong().getTitle();
 		Set<UUID> UUIDList = sp.getPlayerUUIDs();
-		for (UUID uuid: UUIDList) {
+		for (UUID uuid : UUIDList) {
 			Player player = Utils.getOnlinePlayerByUuid(uuid);
-			if(player != null) {
-				if (radiusRadio != null) {
-					isInRange = radiusRadio.isInRange(player);
-				}
-				if (isInRange) {
-					Utils.actionBarMessage(player, song, true);
+			if (player != null) {
+				if (sp instanceof PositionSongPlayer) {
+					radiusRadio = (PositionSongPlayer) sp;
+					inSameWorld = radiusRadio.getTargetLocation().getWorld().equals(player.getWorld());
+					if (inSameWorld && radiusRadio.isInRange(player)) {
+						Utils.actionBarMessage(player, song, true);
+					}
+				} else {
+						Utils.actionBarMessage(player, song, true);
 				}
 			}
 		}
@@ -41,7 +42,7 @@ public class Listeners implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e){
 		Player player = e.getPlayer();
-		SongPlayer radio = Utils.getListenedRadio(player);
+		SongPlayer radio = Utils.getListenedRadio(player, false);
 		if(radio != null) {
 			Radio.removePlayer(player, radio);
 		}
@@ -60,7 +61,7 @@ public class Listeners implements Listener {
 		Player player = e.getPlayer();
 		SongPlayer radiusRadio = e.getSongPlayer();
 		boolean isInRange = e.isInRange();
-		SongPlayer listenedRadio = Utils.getListenedRadio(player);
+		SongPlayer listenedRadio = Utils.getListenedRadio(player, true);
 
 		if(listenedRadio == Radio.serverRadio && isInRange){
 			// Make the player leave the server radio if they are listening, and join the radius radio

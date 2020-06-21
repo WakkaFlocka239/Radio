@@ -22,16 +22,24 @@ public class Command implements CommandExecutor {
 			return false;
 		}
 		Player player = (Player) sender;
-		String usage = "Usage: /radio join|leave|toggle|songinfo";
-		String usageAdmin = "Usage: /radio admin players|songs|reload";
+		String usage_player = "§3Usage: §8/§fradio§e ... \n" +
+				"  §esonginfo §8-§f Shows the song info of the current song you are listening to \n" +
+				"  §eplaylist §8-§f Shows the playlist of the radio you are listening to \n" +
+				"  §ejoin §8-§f Join the Server Radio \n" +
+				"  §eleave §8-§f Leave the Server Radio \n" +
+				"  §etoggle §8-§f Toggles inbetween joining and leaving the Server Radio";
+		String usage_admin= "§3Usage: §8/§fradio admin§c ... \n" +
+				"  §cplayers §8-§f Lists all players listening to the Server Radio \n" +
+				"  §creload §8-§f Reloads the config, and remakes every radio";
 
-		if(!player.hasPermission("radio.player") || !player.hasPermission("radio.admin")){
+		if(!player.hasPermission("radio.player")){
 			return false;
 		}
 
 		if(args.length >= 1) {
 			firstarg:
 			switch(args[0]){
+				// Server Radio
 				case "join":
 					if(!Utils.isInRangeOfAnyRadiusRadio(player)){
 						addPlayer(player, serverRadio);
@@ -57,9 +65,10 @@ public class Command implements CommandExecutor {
 						addServerRadioListener(player);
 					}
 					break;
+				// Radio Info
 				case "songinfo":
 					// Gets radio listened to or if in radius of a radius radio, gets the radius radio
-					SongPlayer radio = Utils.getListenedRadio(player);
+					SongPlayer radio = Utils.getListenedRadio(player, true);
 
 					if(radio == null) {
 						player.sendMessage(PREFIX + " §cYou are not listening to a radio!");
@@ -77,6 +86,36 @@ public class Command implements CommandExecutor {
 					player.sendMessage("§3Progress:§e " + percent + "§e%");
 					player.sendMessage("");
 					break;
+				case "playlist":
+					// Gets radio listened to or if in radius of a radius radio, gets the radius radio
+					SongPlayer tmpRadio = Utils.getListenedRadio(player, true);
+					if(tmpRadio == null) {
+						player.sendMessage(PREFIX + " §cYou are not listening to a radio!");
+						break;
+					}
+					List<Song> songs = tmpRadio.getPlaylist().getSongList();
+					int songListSize = songs.size();
+					if (songListSize > 0) {
+						StringBuilder songList = new StringBuilder();
+						int ndx = 1;
+						for (Song tempSong : songs) {
+							File songFile = tempSong.getPath();
+							songList.append("§3").append(ndx).append(" §e").append(songFile.getName());
+							if (songListSize > 1) {
+								songList.append("\n");
+							}
+							ndx++;
+						}
+						player.sendMessage(PREFIX + " §3Songs in playlist:");
+						player.sendMessage(songList.toString());
+					} else {
+						player.sendMessage(PREFIX + " §cNo songs in playlist.");
+					}
+
+					player.sendMessage("");
+					break;
+
+				// Admin Commands
 				case "admin":
 					if(!player.hasPermission("radio.admin") || args.length < 2)
 						break;
@@ -114,37 +153,20 @@ public class Command implements CommandExecutor {
 							}
 							player.sendMessage("");
 							break firstarg;
-
-						case "songs":
-							List<Song> songs = serverRadio.getPlaylist().getSongList();
-							int songListSize = songs.size();
-							if(songListSize > 0) {
-								StringBuilder songList = new StringBuilder();
-								int ndx = 1;
-								for (Song tempSong : songs) {
-									File songFile = tempSong.getPath();
-									songList.append("§3").append(ndx).append(" §e").append(songFile.getName());
-									if (songListSize > 1) {
-										songList.append("\n");
-									}
-									ndx++;
-								}
-								player.sendMessage(PREFIX + " §3Songs in playlist:");
-								player.sendMessage(songList.toString());
-							}else{
-								player.sendMessage(PREFIX + " §cNo songs in playlist.");
-							}
-							player.sendMessage("");
-							break firstarg;
 					}
 				default:
-					player.sendMessage(usage);
+					player.sendMessage(usage_player);
+					player.sendMessage("");
 
 			}
 		}else {
-			player.sendMessage(usage);
-			if(player.hasPermission("radio.admin"))
-				player.sendMessage(usageAdmin);
+			player.sendMessage(usage_player);
+			if(player.hasPermission("radio.admin")) {
+				player.sendMessage(usage_admin);
+				player.sendMessage("");
+			}else{
+				player.sendMessage("");
+			}
 		}
 		return true;
 	}

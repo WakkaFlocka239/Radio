@@ -17,9 +17,13 @@ import static me.wakka.radio.Radio.serverRadio;
 
 class Utils {
 	static void actionBarMessage(Player p, String songTitle, boolean nowPlaying){
-		String message = "§2§lCurrently Playing: §f";
-		if(nowPlaying) message = "§2§lNow Playing: §f";
+		String message = "§2§lCurrently Playing: §a";
+		if(nowPlaying) message = "§2§lNow Playing: §a";
 		message += " " + songTitle;
+		actionBarMessage(p, message);
+	}
+
+	static void actionBarMessage(Player p, String message){
 		p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
 	}
 
@@ -30,14 +34,20 @@ class Utils {
 		return false;
 	}
 
-	static SongPlayer getListenedRadio(Player player){
+	static SongPlayer getListenedRadio(Player player, boolean includeRadius){
 		if(isListening(player, serverRadio)){
 			return serverRadio;
 		}else{
 			List<PositionSongPlayer> radiusRadios = Radio.getRadiusRadios();
 			for (PositionSongPlayer radio: radiusRadios) {
-				if(isListening(player, radio) && isInRangeOfRadiusRadio(player, radio)){
-					return radio;
+				if(isListening(player, radio)){
+					if(includeRadius) {
+						if(isInRangeOfRadiusRadio(player, radio))
+							return radio;
+					}else{
+						if(isListening(player, radio))
+							return radio;
+					}
 				}
 			}
 		}
@@ -45,12 +55,12 @@ class Utils {
 	}
 
 	static boolean isInRangeOfRadiusRadio(Player player, PositionSongPlayer radio) {
-		return radio.isInRange(player);
+		return radio.getTargetLocation().getWorld().equals(player.getWorld()) && radio.isInRange(player);
 	}
 
 	static boolean isInRangeOfAnyRadiusRadio(Player player) {
 		for (PositionSongPlayer radiusRadio : Radio.radiusRadios) {
-			if(radiusRadio.isInRange(player)){
+			if(radiusRadio.getTargetLocation().getWorld().equals(player.getWorld()) && radiusRadio.isInRange(player)){
 				return true;
 			}
 		}
