@@ -18,23 +18,19 @@ public class Listeners implements Listener {
 	@EventHandler
 	public void onSongNext(SongNextEvent e) {
 		SongPlayer sp = e.getSongPlayer();
-		PositionSongPlayer radiusRadio = null;
-		boolean isInRange = true;
-		boolean inSameWorld = true;
+		PositionSongPlayer radiusRadio;
 		String song = sp.getSong().getTitle();
 		Set<UUID> UUIDList = sp.getPlayerUUIDs();
+
 		for (UUID uuid : UUIDList) {
 			Player player = Utils.getOnlinePlayerByUuid(uuid);
 			if (player != null) {
 				if (sp instanceof PositionSongPlayer) {
 					radiusRadio = (PositionSongPlayer) sp;
-					inSameWorld = radiusRadio.getTargetLocation().getWorld().equals(player.getWorld());
-					if (inSameWorld && radiusRadio.isInRange(player)) {
+					if(Utils.isInRangeOfRadiusRadio(player, radiusRadio))
 						Utils.actionBarMessage(player, song, true);
-					}
-				} else {
+				} else
 						Utils.actionBarMessage(player, song, true);
-				}
 			}
 		}
 	}
@@ -43,17 +39,15 @@ public class Listeners implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent e){
 		Player player = e.getPlayer();
 		SongPlayer radio = Utils.getListenedRadio(player, false);
-		if(radio != null) {
+		if(radio != null)
 			Radio.removePlayer(player, radio);
-		}
 	}
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e){
 		Player player = e.getPlayer();
-		for (PositionSongPlayer radio: Radio.radiusRadios) {
+		for (PositionSongPlayer radio : Radio.radiusRadios)
 			Radio.addPlayer(player, radio);
-		}
 	}
 
 	@EventHandler
@@ -69,7 +63,7 @@ public class Listeners implements Listener {
 			Radio.addPlayer(player, radiusRadio);
 			Utils.actionBarMessage(player, radiusRadio.getSong().getTitle(), false);
 		}else if(isInRange){
-			// Add the player to the radius radio, just incase.
+			// Add the player to the radius radio, just in case.
 			Radio.addPlayer(player, radiusRadio);
 			Utils.actionBarMessage(player, radiusRadio.getSong().getTitle(), false);
 		}else if(Radio.isServerRadioListener(player)){

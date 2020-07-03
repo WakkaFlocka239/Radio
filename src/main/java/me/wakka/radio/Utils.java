@@ -55,6 +55,9 @@ class Utils {
 	}
 
 	static boolean isInRangeOfRadiusRadio(Player player, PositionSongPlayer radio) {
+		if(radio == null) return false;
+		if(radio.getTargetLocation() == null) return false;
+		if(radio.getTargetLocation().getWorld() == null) return false;
 		return radio.getTargetLocation().getWorld().equals(player.getWorld()) && radio.isInRange(player);
 	}
 

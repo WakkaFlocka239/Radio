@@ -3,7 +3,7 @@ name: Radio
 version: 1.0.0
 author: WakkaFlocka
 description: Radio stations that play .nbs songs
-softdepend: [NoteBlockAPI]
+depend: [NoteBlockAPI]
 api-version: "1.15"
 permissions:
   radio.player:

@@ -32,20 +32,17 @@ public class Radio extends JavaPlugin {
 	// TODO: If you're listening to a radius radio, and you do /radio toggle, it turns on the server radio,
 	//		--> needs to check if you're listening to a radius radio "you are too close to another radio"
 	public Radio(){
-		if (instance == null){
+		if (instance == null)
 			instance = this;
-		}else{
+		else
 			throw new IllegalStateException();
-		}
 	}
 
 	@Override
 	public void onEnable(){
 		// NoteBlockAPI
-		boolean NoteBlockAPI = true;
 		if (!Bukkit.getPluginManager().isPluginEnabled("NoteBlockAPI")){
 			getLogger().severe("*** NoteBlockAPI is not installed or not enabled. ***");
-			NoteBlockAPI = false;
 			return;
 		}
 
@@ -56,11 +53,11 @@ public class Radio extends JavaPlugin {
 			e.printStackTrace();
 		}
 
-		// Register Listeners
-		getServer().getPluginManager().registerEvents(new Listeners(), this);
-
 		// Setup Command Executor
 		Objects.requireNonNull(this.getCommand("radio")).setExecutor(new Command());
+
+		// Register Listeners
+		getServer().getPluginManager().registerEvents(new Listeners(), this);
 
 		// Load All Songs
 		allSongFiles = SONGS_DIR.listFiles();
@@ -70,7 +67,6 @@ public class Radio extends JavaPlugin {
 
 		// Setup Server Radio
 		setupServerRadio();
-
 	}
 
 	@Override
@@ -103,16 +99,15 @@ public class Radio extends JavaPlugin {
 		Song song;
 		String songPath;
 		int songCount;
-		if (serverRadioSongs != null) {
+		if (serverRadioSongs != null && serverRadioSongs.length > 0) {
 			songCount = serverRadioSongs.length;
 
 			File[] songFiles = Utils.shuffleArray(serverRadioSongs);
 			Song[] songList = new Song[songCount];
 
 			for (int i = 0; i < songCount; i++) {
-				if (serverRadioSongs[i] == null) {
+				if (serverRadioSongs[i] == null)
 					getLogger().severe("Song index " + i + " in server-radio.yml is invalid.");
-				}
 
 				songPath = songFiles[i].getPath();
 				song = NBSDecoder.parse(new File(songPath));
@@ -121,9 +116,8 @@ public class Radio extends JavaPlugin {
 			Playlist playlist = new Playlist(songList);
 			serverRadio = new RadioSongPlayer(playlist);
 			setRadioDefaults(serverRadio);
-		}else{
+		}else
 			getLogger().severe("Server Radio playlist is empty!");
-		}
 	}
 
 	private File[] getServerRadioSongs(){
@@ -153,9 +147,8 @@ public class Radio extends JavaPlugin {
 
 		for (String radioName : radios) {
 			boolean enable = radiusRadioFC.getBoolean("radius_radios." + radioName + ".enabled");
-			if(!enable) {
-				continue;
-			}
+			if(!enable) continue;
+
 			int x = radiusRadioFC.getInt("radius_radios." + radioName + ".location.x");
 			int y = radiusRadioFC.getInt("radius_radios." + radioName + ".location.y");
 			int z = radiusRadioFC.getInt("radius_radios." + radioName + ".location.z");
@@ -174,9 +167,8 @@ public class Radio extends JavaPlugin {
 				Song[] songList = new Song[songCount];
 
 				for (int i = 0; i < songCount; i++) {
-					if (radiusRadioSongs[i] == null) {
+					if (radiusRadioSongs[i] == null)
 						getLogger().severe("Song index " + i + " for " + radioName + " in radius-radio.yml is invalid.");
-					}
 
 					songPath = songFiles[i].getPath();
 					song = NBSDecoder.parse(new File(songPath));
@@ -191,9 +183,8 @@ public class Radio extends JavaPlugin {
 
 				// Add all online players to the radius radio
 				Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
-				for (Player player : onlinePlayers) {
+				for (Player player : onlinePlayers)
 					radio.addPlayer(player);
-				}
 
 				radiusRadios.add(radio);
 			}
@@ -204,7 +195,7 @@ public class Radio extends JavaPlugin {
 		File[] allAsList = getAllSongFiles();
 		List<String> songFiles = radiusRadioFC.getStringList("radius_radios." + radioName + ".playlist");
 		int count = songFiles.size();
-		Bukkit.getLogger().info("<"+radioName+"> " + count + " Loaded Songs: " + songFiles.toString());
+		Bukkit.getLogger().info("<" + radioName + "> " + count + " Loaded Songs: " + songFiles.toString());
 
 		// If song in config == loaded song, add song to array
 		int i = 0;
@@ -234,11 +225,11 @@ public class Radio extends JavaPlugin {
 
 		Fade fadeIn = radio.getFadeIn();
 		fadeIn.setType(FadeType.LINEAR);
-		fadeIn.setFadeDuration(60); //in ticks
+		fadeIn.setFadeDuration(60);
 
 		Fade fadeOut = radio.getFadeOut();
 		fadeOut.setType(FadeType.LINEAR);
-		fadeOut.setFadeDuration(60); //in ticks
+		fadeOut.setFadeDuration(60);
 
 		radio.setRandom(true);
 		radio.setRepeatMode(RepeatMode.ALL);
@@ -262,24 +253,21 @@ public class Radio extends JavaPlugin {
 		if(Utils.isListening(player, radio)) {
 			radio.removePlayer(player);
 			Utils.actionBarMessage(player, "§c§lYou have left the server radio");
-		}else{
+		}else
 			player.sendMessage(Command.PREFIX + " §cYou are not listening to a radio!");
-		}
 	}
 
 	// These three methods control the server radio listeners list
 	// Used for turning back on the server radio when exiting a radius radio,
 	// 		ONLY IF they had it on before entering.
 	static void addServerRadioListener(Player player){
-		if(!isServerRadioListener(player)) {
+		if(!isServerRadioListener(player))
 			serverRadioListeners.add(player);
-		}
 	}
 
 	static void removeServerRadioListener(Player player){
-		if(isServerRadioListener(player)) {
+		if(isServerRadioListener(player))
 			serverRadioListeners.remove(player);
-		}
 	}
 
 	static boolean isServerRadioListener(Player player){
@@ -288,9 +276,8 @@ public class Radio extends JavaPlugin {
 	//
 
 	private void createFiles() throws IOException, InvalidConfigurationException {
-		if (!getDataFolder().exists()) {
+		if (!getDataFolder().exists())
 			getDataFolder().mkdirs();
-		}
 
 		File songDir = new File(instance.getDataFolder() + "/songs");
 		if (!songDir.exists())
@@ -300,25 +287,29 @@ public class Radio extends JavaPlugin {
 
 		File serverRadioF = new File(getDataFolder(), "server-radio.yml");
 		serverRadioFC = new YamlConfiguration();
+
 		File radiusRadioF = new File(getDataFolder(), "radius-radio.yml");
 		radiusRadioFC = new YamlConfiguration();
 
 		if (!serverRadioF.exists()) {
 			getLogger().info("server-radio.yml not found, creating!");
+
 			if (serverRadioF.createNewFile()){
 				List<String> defaultSongs = new ArrayList<>();
 				defaultSongs.add("Frosty_The_Snowman.nbs");
 				defaultSongs.add("Let_It_Snow.nbs");
+
 				serverRadioFC.set("playlist", defaultSongs);
 				serverRadioFC.save(serverRadioF);
+
 				getLogger().info("server-radio.yml generated.");
-			}else{
+			}else
 				getLogger().severe("&cCould not generate server-radio.yml");
-			}
 		}
 
 		if (!radiusRadioF.exists()) {
 			getLogger().info("radius-radio.yml not found, creating!");
+
 			if (radiusRadioF.createNewFile()){
 				radiusRadioFC.set("radius_radios.spawn.enabled", true);
 				radiusRadioFC.set("radius_radios.spawn.location.x", -2);
@@ -343,13 +334,11 @@ public class Radio extends JavaPlugin {
 				defaultSongs.add("Frosty_The_Snowman.nbs");
 				defaultSongs.add("Let_It_Snow.nbs");
 				radiusRadioFC.set("radius_radios.pugmas.playlist", defaultSongs);
-
 				radiusRadioFC.save(radiusRadioF);
 
 				getLogger().info("radius-radio.yml generated.");
-			}else{
+			}else
 				getLogger().severe("&cCould not generate server-radio.yml");
-			}
 		}
 
 		serverRadioFC.load(serverRadioF);
